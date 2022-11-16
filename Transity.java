@@ -156,6 +156,22 @@ class TransitDatabase {
 
     public void displayRoute(String name) {
         System.out.println("Yay you triggered the displayRoute thing"); // Delete
+        try {
+            String sql = "Select * from Route;";
+
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                System.out.println(resultSet.getInt("route") + " - " + resultSet.getString("route") + " "
+                        + resultSet.getString("route name") + ", " + resultSet.getInt("name"));
+
+            }
+            resultSet.close();
+            statement.close();
+        } catch (SQLException e) {
+            e.printStackTrace(System.out);
+        }
     }
 
     public void displayStop(String name) {
