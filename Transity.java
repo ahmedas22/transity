@@ -15,7 +15,7 @@ public class Transity {
     public static void main(String[] args) throws Exception {
 
         // startup sequence
-        TransitDatabase db = new TransitDatabase();
+        TransitDatabase db = new TransitDatabase("project.sql");
         runConsole(db);
 
         System.out.println("Exiting...");
@@ -143,11 +143,12 @@ public class Transity {
 class TransitDatabase {
     private Connection connection;
 
-    public TransitDatabase() {
+    public TransitDatabase(String sqlFile) {
+        connection = null;
         try {
             String url = "jdbc:sqlite:library.db";
             // create a connection to the database
-            connection = DriverManager.getConnection(url);
+            connection = null;
         } catch (SQLException e) {
             e.printStackTrace(System.out);
         }
@@ -164,7 +165,7 @@ class TransitDatabase {
 
             while (resultSet.next()) {
                 System.out.println(resultSet.getInt("route") + " - " + resultSet.getString("route") + " "
-                        + resultSet.getString("route name") + ", " + resultSet.getInt("name"));
+                        + resultSet.getString("route name") + ", " + resultSet.getInt("name "));
 
             }
             resultSet.close();
