@@ -1,21 +1,12 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.sql.SQLException;
-import java.sql.PreparedStatement;
-
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.BufferedReader;
-import java.util.Scanner;
+import java.sql.*;
+import java.io.*;
+import java.util.*;
 
 public class Transity {
 
     public static void main(String[] args) throws Exception {
-
         // startup sequence
-        TransitDatabase db = new TransitDatabase("project.sql");
+        TransitDatabase db = new TransitDatabase("auth.cfg", "project.sql");
         runConsole(db);
 
         System.out.println("Exiting...");
@@ -143,16 +134,60 @@ public class Transity {
 class TransitDatabase {
     private Connection connection;
 
-    public TransitDatabase(String sqlFile) {
+    public TransitDatabase(String authFile, String sqlFile) {
         connection = null;
+        Properties properties = new Properties();
         try {
-            String url = "jdbc:sqlite:library.db";
-            // create a connection to the database
-            connection = null;
-        } catch (SQLException e) {
-            e.printStackTrace(System.out);
+            FileInputStream configFile = new FileInputStream(authFile);
+            properties.load(configFile);
+            configFile.close();
+        } catch (IOException e) {
+            System.out.println("Can't read file.");
+            System.exit(1);
         }
 
+        String username = (properties.getProperty("username"));
+        String password = (properties.getProperty("password"));
+
+        if (username == null) {
+            System.out.println("Username not provided.");
+            System.exit(1);
+        } else if (password == null) {
+            System.out.println("Password not provided.");
+            System.exit(1);
+        } else {
+            try {
+                connection = DriverManager.getConnection(
+                        "jdbc:sqlserver://uranium.cs.umanitoba.ca:1433;database=cs3380;user=" + username + ";"
+                                + "password=" + password
+                                + ";encrypt=false;trustServerCertificate=false;loginTimeout=30;");
+                System.out.println("Connection established......");
+                buildData(sqlFile);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    private void buildData(String file) {
+        try {
+            Scanner readIn = new Scanner(new File(file));
+            System.out.println("Building Data!");
+            while (readIn.hasNextLine()) {
+                try {
+                    String sql = readIn.nextLine();
+                    System.out.println(sql);
+                    Statement statement = connection.createStatement();
+                    statement.executeUpdate(sql);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            System.out.println("Data Built......");
+        } catch (IOException e) {
+            System.out.println("Invalid file");
+        }
     }
 
     public void displayRoute(String name) {

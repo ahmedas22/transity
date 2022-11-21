@@ -1,11 +1,11 @@
 
 build: Transity.class
 
-CallTheManager.class: Transity.java
+Transity.class: Transity.java
 	javac Transity.java
 
 run: Transity.class
-	java -cp .:sqlite-jdbc-3.39.3.0.jar Transity
+	java -cp .:mssql-jdbc-11.2.0.jre11.jar Transity ./auth.cfg
 
 clean:
 	rm Transity.class
